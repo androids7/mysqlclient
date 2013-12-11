@@ -4,5 +4,7 @@
         <file>del.png</file>
         <file>next.png</file>
         <file>prev.png</file>
+        <file>first.png</file>
+        <file>last.png</file>
     </qresource>
 </RCC>

@@ -1,45 +1,42 @@
-#include "editparts.h"
-#include "ui_editparts.h"
-#include "pixmaploaddelegate.h"
+#include "editproviders.h"
+#include "ui_editproviders.h"
 
-#include <QIcon>
-#include <QFile>
 #include <QDebug>
-#include <QPixmap>
-#include <QBuffer>
-#include <QByteArray>
-#include <QFileDialog>
+#include <QVariant>
+#include <QMessageBox>
+#include <QtSql>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QSqlTableModel>
+#include <QSqlRelationalTableModel>
 #include <QDataWidgetMapper>
 
-#include <QSqlRecord>
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QSqlRelation>
-#include <QSqlDatabase>
-#include <QSqlTableModel>
-#include <QSqlRelationalDelegate>
-#include <QSqlRelationalTableModel>
+#include "connectiondialog.h"
 
-EditParts::EditParts(int id, QWidget *parent) :
+EditProviders::EditProviders(int id, QWidget *parent) :
     id(id),
     QDialog(parent),
-    ui(new Ui::EditParts)
+    ui(new Ui::EditProviders)
 {
     ui->setupUi(this);
 
-    model = new QSqlTableModel(this);
-    model->setTable("parts");    
+    model = new QSqlRelationalTableModel(this);
+    model->setTable("providers");
+    model->setRelation(2, QSqlRelation("cities", "city_ID", "name"));
     model->setSort(0, Qt::AscendingOrder);
     model->select();
 
+    QSqlTableModel *tableModel = model->relationModel(2);
+    ui->comboBox->setModel(tableModel);
+    ui->comboBox->setModelColumn(tableModel->fieldIndex("name"));
+
     mapper = new QDataWidgetMapper(this);
-    mapper->setItemDelegate(new PixmapLoadDelegate(mapper));
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
     mapper->setModel(model);
-    mapper->addMapping(ui->editName, 1);
-    mapper->addMapping(ui->editMaterial, 2);
-    mapper->addMapping(ui->spinboxWeight, 3);
-    mapper->addMapping(ui->imageLabel, 4);
+    mapper->setItemDelegate(new QSqlRelationalDelegate(this));
+    mapper->addMapping(ui->editProviderName, 1);
+    mapper->addMapping(ui->comboBox, 2);
 
     if(id == 0) {
         mapper->toFirst();
@@ -52,7 +49,6 @@ EditParts::EditParts(int id, QWidget *parent) :
             }
         }
     }
-
     connect(ui->btnNext, SIGNAL(clicked()), mapper, SLOT(toNext()));
     connect(ui->btnNext, SIGNAL(clicked()), this, SLOT(inc()));
     connect(ui->btnPrev, SIGNAL(clicked()), mapper, SLOT(toPrevious()));
@@ -63,41 +59,26 @@ EditParts::EditParts(int id, QWidget *parent) :
     connect(ui->btnLast, SIGNAL(clicked()), mapper, SLOT(toLast()));
     connect(ui->btnFirst, SIGNAL(clicked()), this, SLOT(first()));
     connect(ui->btnLast, SIGNAL(clicked()), this, SLOT(last()));
-    connect(ui->btnLoadImage, SIGNAL(clicked()), this, SLOT(loadImage()));
 }
 
-EditParts::~EditParts()
+EditProviders::~EditProviders()
 {
     delete ui;
 }
 
-void EditParts::loadImage()
-{
-    QString filter = "*.png, *.jpg";
-    QString imgName = QFileDialog::getOpenFileName(this, tr("Загрузить изображение детали"),
-                                                   tr("/home/work/Изображения"), filter);
-    if(imgName.isEmpty())
-        return;
-
-    uploadedImage = new QPixmap(imgName);
-    ui->imageLabel->setPixmap(*uploadedImage);
-}
-
-void EditParts::add()
+void EditProviders::add()
 {
     int row = mapper->currentIndex();
     mapper->submit();
     model->insertRow(row);
     mapper->setCurrentIndex(row);
-    ui->editName->clear();
-    ui->editMaterial->clear();
-    ui->imageLabel->setText(tr("Нет изображения"));
-    ui->spinboxWeight->setValue(0);
-    ui->editName->setFocus();
-    id = mapper->currentIndex();    
+    ui->editProviderName->clear();
+    ui->comboBox->setCurrentIndex(0);
+    ui->editProviderName->setFocus();
+    id = mapper->currentIndex();
 }
 
-void EditParts::del()
+void EditProviders::del()
 {
     int row = mapper->currentIndex();
     model->removeRow(row);
@@ -105,30 +86,31 @@ void EditParts::del()
     mapper->setCurrentIndex(qMin(row, model->rowCount()-1));
 }
 
-void EditParts::inc()
+void EditProviders::inc()
 {
+    qDebug() << id;
     id = qMin(model->rowCount()-1, id+1);
     mapper->setCurrentIndex(id);
 }
 
-void EditParts::dec()
+void EditProviders::dec()
 {
     id = qMax(0, id-1);
     mapper->setCurrentIndex(id);
 }
 
-void EditParts::accept()
+void EditProviders::last()
+{
+    id = model->rowCount() - 1;
+}
+
+void EditProviders::accept()
 {
     mapper->submit();
 }
 
-void EditParts::reject()
+void EditProviders::reject()
 {
     mapper->revert();
     QDialog::reject();
-}
-
-void EditParts::last()
-{
-    id = model->rowCount() - 1;
 }

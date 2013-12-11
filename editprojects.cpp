@@ -21,7 +21,7 @@ EditProjects::EditProjects(int id, QWidget *parent) :
     model = new QSqlRelationalTableModel(this);
     model->setTable("projects");
     model->setRelation(2, QSqlRelation("cities", "city_ID", "name"));
-    model->setSort(1, Qt::AscendingOrder);
+    model->setSort(0, Qt::AscendingOrder);
     model->select();
 
     QSqlTableModel *tableModel = model->relationModel(2);
@@ -35,13 +35,13 @@ EditProjects::EditProjects(int id, QWidget *parent) :
     mapper->addMapping(ui->editProjectName, 1);
     mapper->addMapping(ui->comboBox, 2);
 
-    if(id == 0) {
+    if(id == 0) {        
         mapper->toFirst();
     } else {
         for(int i = 0; i < model->rowCount(); ++i) {
             QSqlRecord rec = model->record(i);
             if(rec.value(0).toInt() == id) {
-                mapper->setCurrentIndex(i);
+                mapper->setCurrentIndex(i+1);
                 break;
             }
         }
@@ -52,6 +52,10 @@ EditProjects::EditProjects(int id, QWidget *parent) :
     connect(ui->btnPrev, SIGNAL(clicked()), this, SLOT(dec()));
     connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(add()));
     connect(ui->btnDel, SIGNAL(clicked()), this, SLOT(del()));
+    connect(ui->btnFirst, SIGNAL(clicked()), mapper, SLOT(toFirst()));
+    connect(ui->btnLast, SIGNAL(clicked()), mapper, SLOT(toLast()));
+    connect(ui->btnFirst, SIGNAL(clicked()), this, SLOT(first()));
+    connect(ui->btnLast, SIGNAL(clicked()), this, SLOT(last()));
 }
 
 EditProjects::~EditProjects()
@@ -61,34 +65,44 @@ EditProjects::~EditProjects()
 
 void EditProjects::add()
 {
-    mapper->submit();
-    id++;
-    model->insertRow(id);
-    mapper->setCurrentIndex(id);
+    int row = mapper->currentIndex();
+    mapper->submit();    
+    model->insertRow(row);
+    mapper->setCurrentIndex(row);
     ui->editProjectName->clear();
     ui->comboBox->setCurrentIndex(0);
     ui->editProjectName->setFocus();
+    id = mapper->currentIndex();
 }
 
 void EditProjects::del()
 {
-
+    int row = mapper->currentIndex();
+    model->removeRow(row);
+    mapper->submit();
+    mapper->setCurrentIndex(qMin(row, model->rowCount()-1));
 }
 
 void EditProjects::inc()
 {
     //qDebug() << "old inc: " << id;
     id = qMin(model->rowCount()-1, id+1);
-    //qDebug() << "new inc: " << id;
     mapper->setCurrentIndex(id);
+    //qDebug() << "new inc: " << id;
+
 }
 
 void EditProjects::dec()
 {
     //qDebug() << "old dec: " << id;
     id = qMax(0, id-1);
-    //qDebug() << "new dec: " << id;
     mapper->setCurrentIndex(id);
+    //qDebug() << "new dec: " << id;
+}
+
+void EditProjects::last()
+{
+    id = model->rowCount() - 1;
 }
 
 void EditProjects::accept()

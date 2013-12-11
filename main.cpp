@@ -10,6 +10,8 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 
+#include <QTextCodec>
+
 #include "editprojects.h"
 
 void test() {
@@ -28,7 +30,8 @@ void test() {
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-
+    QTextCodec *c = QTextCodec::codecForLocale();
+    QTextCodec::setCodecForTr(c);
     //test();
     //EditProjects dlg;
     //dlg.show();

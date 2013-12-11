@@ -6,7 +6,9 @@
 namespace Ui {
 class EditParts;
 }
+class QLabel;
 class QSqlTableModel;
+class QSqlRelationalTableModel;
 class QDataWidgetMapper;
 class EditParts : public QDialog
 {
@@ -14,17 +16,24 @@ class EditParts : public QDialog
     
 public:
     explicit EditParts(int id, QWidget *parent = 0);
-    ~EditParts();
+    ~EditParts();    
     void accept();
     void reject();
 
 public slots:
+    void loadImage();
     void inc();
     void dec();
+    void add();
+    void del();    
+    void first() { id = 0; }
+    void last();
 
 private:
     Ui::EditParts *ui;
     int id;
+    QLabel *lbl;
+    QPixmap *uploadedImage;
     QSqlTableModel *model;
     QDataWidgetMapper *mapper;
 };

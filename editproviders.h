@@ -1,20 +1,20 @@
-#ifndef EDITPROJECTS_H
-#define EDITPROJECTS_H
+#ifndef EDITPROVIDERS_H
+#define EDITPROVIDERS_H
 
 #include <QDialog>
 
 namespace Ui {
-class EditProjects;
+class EditProviders;
 }
 class QSqlRelationalTableModel;
 class QDataWidgetMapper;
-class EditProjects : public QDialog
+class EditProviders : public QDialog
 {
     Q_OBJECT
     
 public:
-    explicit EditProjects(int id, QWidget *parent = 0);
-    ~EditProjects();
+    explicit EditProviders(int id, QWidget *parent = 0);
+    ~EditProviders();
     void accept();
     void reject();
 
@@ -27,10 +27,10 @@ public slots:
     void last();
 
 private:
-    Ui::EditProjects *ui;
+    Ui::EditProviders *ui;
     int id;
     QSqlRelationalTableModel *model;
     QDataWidgetMapper *mapper;
 };
 
-#endif // EDITPROJECTS_H
+#endif // EDITPROVIDERS_H

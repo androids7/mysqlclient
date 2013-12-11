@@ -4,7 +4,9 @@ SOURCES += \
     mysqlclient.cpp \
     connectiondialog.cpp \
     editprojects.cpp \
-    editparts.cpp
+    editparts.cpp \
+    editproviders.cpp \
+    pixmaploaddelegate.cpp
 
 QT += widgets gui sql
 
@@ -14,13 +16,16 @@ HEADERS += \
     mysqlclient.h \
     connectiondialog.h \
     editprojects.h \
-    editparts.h
+    editparts.h \
+    editproviders.h \
+    pixmaploaddelegate.h
 
 FORMS += \
     mysqlclient.ui \
     connectiondialog.ui \
     editprojects.ui \
-    editparts.ui
+    editparts.ui \
+    editproviders.ui
 
 RESOURCES += \
     img.qrc

@@ -122,6 +122,9 @@
       <property name="text">
        <string>Автоматическое подключение</string>
       </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
     <item row="0" column="1" rowspan="3">
@@ -142,20 +145,19 @@
     <property name="title">
      <string>Настройки</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Формы редактирования</string>
-    </property>
-    <addaction name="actionEditProjects"/>
+    <addaction name="actionEdit"/>
    </widget>
    <addaction name="menuOptions"/>
-   <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionEditProjects">
    <property name="text">
     <string>Проекты</string>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="text">
+    <string>Формы редактирования</string>
    </property>
   </action>
  </widget>

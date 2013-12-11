@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EditProjects</class>
- <widget class="QDialog" name="EditProjects">
-  <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
-  </property>
+ <class>EditProviders</class>
+ <widget class="QDialog" name="EditProviders">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,14 +10,8 @@
     <height>151</height>
    </rect>
   </property>
-  <property name="contextMenuPolicy">
-   <enum>Qt::NoContextMenu</enum>
-  </property>
   <property name="windowTitle">
-   <string>Форма редактирования проектов</string>
-  </property>
-  <property name="modal">
-   <bool>true</bool>
+   <string>Форма редактирования поставщиков</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0" colspan="2">
@@ -212,12 +203,12 @@
      <item row="0" column="0">
       <widget class="QLabel" name="labelProjectName">
        <property name="text">
-        <string>Имя проекта:</string>
+        <string>Имя поставщика:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="editProjectName">
+      <widget class="QLineEdit" name="editProviderName">
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
@@ -271,34 +262,34 @@
  </resources>
  <connections>
   <connection>
-   <sender>btnCancel</sender>
+   <sender>btnSubmit</sender>
    <signal>clicked()</signal>
-   <receiver>EditProjects</receiver>
-   <slot>reject()</slot>
+   <receiver>EditProviders</receiver>
+   <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>343</x>
-     <y>126</y>
+     <x>167</x>
+     <y>132</y>
     </hint>
     <hint type="destinationlabel">
-     <x>313</x>
-     <y>146</y>
+     <x>117</x>
+     <y>144</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>btnSubmit</sender>
+   <sender>btnCancel</sender>
    <signal>clicked()</signal>
-   <receiver>EditProjects</receiver>
-   <slot>accept()</slot>
+   <receiver>EditProviders</receiver>
+   <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
-     <y>130</y>
+     <x>289</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>55</x>
-     <y>145</y>
+     <x>312</x>
+     <y>29</y>
     </hint>
    </hints>
   </connection>

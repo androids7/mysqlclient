@@ -12,9 +12,11 @@
 #include <QSqlRelationalTableModel>
 #include <QDataWidgetMapper>
 #include <QApplication>
+
 #include "connectiondialog.h"
-#include "editprojects.h"
 #include "editparts.h"
+#include "editprojects.h"
+#include "editproviders.h"
 
 MysqlClient::MysqlClient(QWidget *parent) :
     QMainWindow(parent),
@@ -34,36 +36,67 @@ MysqlClient::MysqlClient(QWidget *parent) :
             this, SLOT(slotSubmitEditing()));
     connect(ui->btnCancelEditing, SIGNAL(clicked()),
             this, SLOT(slotCancelEditing()));
+    connect(ui->comboTable, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(slotAutoConnect()));
 
     ui->tableView->setSortingEnabled(true);
     ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tableView->resizeColumnsToContents();
-    ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    ui->tableView->hideColumn(0);
+    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);    
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    connect(ui->menuEdit->actions()[0], SIGNAL(triggered()),
+    connect(ui->menuOptions->actions()[0], SIGNAL(triggered()),
             this, SLOT(showEditProjectsForm()));
 }
 
-void MysqlClient::configureGUI()
+void MysqlClient::notImplemented()
 {
-    /* Need remove this method*/
+    QMessageBox::information(this, "Attention!", "This feature has not been implemented yet.");
 }
 
 void MysqlClient::showEditProjectsForm()
 {
-    int id = 0;
+    int id = 1;
     QModelIndex index = ui->tableView->currentIndex();
     if(index.isValid()) {
-        QSqlRecord record = relModel->record(index.row());
+        QSqlRecord record;
+        if(isRelModel)
+            record = relModel->record(index.row());
+        else {
+            record = model->record(index.row());
+        }
         id = record.value(0).toInt();
+    }    
+    //qDebug() << id;
+    id--;
+    switch(ui->comboTable->currentIndex()) {
+    case 2: { /* item "parts" was selected */
+        EditParts dlg(id, this);
+        dlg.exec();
+        }
+        break;
+    case 3: { /* item "projects" was selected */
+        EditProjects dlg(id, this);
+        dlg.exec();
+        }
+        break;
+    case 4: { /* item "providers" was selected */
+        EditProviders dlg(id, this);
+        dlg.exec();
+        }
+        break;
+    default:
+        notImplemented();
+        return;
     }
-    EditProjects dlg(id, this);
-    dlg.exec();
     slotFetchData();
-    /*EditParts dlg2(0, this);
+    /*
     dlg2.exec();*/
+}
+
+void MysqlClient::slotAutoConnect()
+{
+    if(ui->checkboxAutoConn->isChecked()) {
+        slotFetchData();
+    }
 }
 
 MysqlClient::~MysqlClient()
@@ -144,7 +177,7 @@ void MysqlClient::slotFetchData()
             relModel->setHeaderData(1, Qt::Horizontal, tr("name"));
             relModel->setHeaderData(2, Qt::Horizontal, tr("city"));
         }
-        relModel->setSort(1, Qt::AscendingOrder);
+        relModel->setSort(0, Qt::AscendingOrder);
         relModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
         relModel->select();
         ui->tableView->setModel(relModel);
@@ -154,13 +187,17 @@ void MysqlClient::slotFetchData()
         model = new QSqlTableModel;
         model->setEditStrategy(QSqlTableModel::OnManualSubmit);
         model->setTable("`"+tableName+"`");
-        model->setSort(1, Qt::AscendingOrder);
+        model->setSort(0, Qt::AscendingOrder);
         if(!model->select()) {
             QMessageBox::warning(this, "Ошибка извлечения", model->lastError().text());
             return;
         }
         ui->tableView->setModel(model);
     }
+    ui->tableView->resizeColumnsToContents();
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    ui->tableView->hideColumn(0);
+    ui->tableView->setColumnHidden(4, (tableName == "parts"));
 }
 
 void MysqlClient::setupDelivery()
@@ -217,7 +254,7 @@ void MysqlClient::slotComboDatabaseChanged(int index)
             ui->comboTable->addItem(tableName);
         }
     }
-    ui->comboTable->setCurrentIndex(0);
-    ui->btnConnect->setEnabled(true);    
+    ui->comboTable->setCurrentIndex(0);    
+    ui->btnConnect->setEnabled(true);
     db.close();
 }

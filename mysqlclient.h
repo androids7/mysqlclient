@@ -31,15 +31,15 @@ public slots:
     void slotStartEditing();
     void slotCancelEditing();
     void slotFetchData();
+    void slotAutoConnect();
     void showEditProjectsForm();
 
-private:
-    void configureGUI();
+private:    
     void endEditing();
-
     void setupDelivery();
 
     bool isRelModel;
+    void notImplemented();
 
     Ui::MysqlClient *ui;
     QSqlDatabase db;
